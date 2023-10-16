@@ -2,7 +2,7 @@ import { rest } from 'msw';
 import todoMockListData from '@/components/todo/mock/todoMockListData';
 
 const sessionStorage = {
-  nextId: 4,
+  nextId: 5,
   values: todoMockListData,
 }
 

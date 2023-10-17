@@ -1,32 +1,40 @@
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, toValue, watch } from 'vue';
 
 interface IUseFetchParams {
   url: string;
-  method?: 'GET';
+  method?: 'GET' | 'POST';
 }
 
-interface IRequestState<Data> {
+interface IRequestState<Response, Payload> {
   isLoading: boolean;
-  data?: Data;
+  data?: Response;
   error?: any;
-  fetch: () => void;
+  reFetch: () => void;
+  fetch: (data: Payload) => void;
 }
 
-const useFetch = <Response>(fetchParams: IUseFetchParams) => {
-  const { url, method = "GET" } = fetchParams;
+const useFetch = <Response, Payload extends BodyInit>(fetchParams: IUseFetchParams) => {
+  const { url, method = 'GET' } = fetchParams;
   const reFetch = ref(true);
-  const request = reactive<IRequestState<Response>>({
+  const data = ref<Payload>('')
+  const request = reactive<IRequestState<Response, Payload>>({
     isLoading: false,
-    fetch: () => reFetch.value = !reFetch.value
+    reFetch: () => reFetch.value = !reFetch.value,
+    fetch: (payload) => data.value = payload
   })
   
-  watch([reFetch, () => request.fetch], async () => {
+  watch([reFetch, data, () => request.fetch], async () => {
     request.isLoading = true
     
     try {
-      const response = await fetch<Response>(url, {
+      const options = {
         method
-      })
+      } as RequestInit
+      
+      if (method !== 'GET') {
+        options.body = JSON.stringify((toValue(data) || ''))
+      }
+      const response = await fetch<Response>(url, options)
       
       request.data = await response.json()
     } catch (e) {
@@ -37,7 +45,7 @@ const useFetch = <Response>(fetchParams: IUseFetchParams) => {
   })
   
   if (method === 'GET') {
-    request.fetch()
+    request.reFetch()
   }
   
   return request;

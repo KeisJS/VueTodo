@@ -8,19 +8,21 @@ const taskProvider = () => {
     url: '/tasks',
   })
   
+  const addTask = useFetch<void, Partial<ITodo>>({
+    url: '/tasks',
+    method: 'POST'
+  })
+  
   return {
     tasks,
+    addTask,
   }
 }
 
 const providerKey = Symbol() as InjectionKey<ReturnType<typeof taskProvider>>
 
 const attachTaskProvider = () => {
-  provide(providerKey, {
-    tasks: useFetch<ITodo[]>({
-      url: '/tasks',
-    })
-  })
+  provide(providerKey, taskProvider())
 }
 
 const injectTasks = () => inject(providerKey);

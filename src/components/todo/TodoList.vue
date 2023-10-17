@@ -1,7 +1,14 @@
 <script setup lang="ts">
 import { injectTasks } from '@/components/todo/taskProvider';
+import { watch } from 'vue';
 
 const taskDeps = injectTasks()
+
+watch(() => taskDeps?.addTask.isLoading, () => {
+  if (taskDeps && !taskDeps.addTask.isLoading) {
+    taskDeps.tasks.reFetch();
+  }
+})
 </script>
 
 <template>

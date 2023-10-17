@@ -12,5 +12,18 @@ export default [
       ctx.status(200),
       ctx.json(sessionStorage.values),
     )
+  }),
+  
+  rest.post('/tasks', async (req, res, ctx) => {
+    const body = await req.json()
+    
+    sessionStorage.values.push({
+      id: sessionStorage.nextId++,
+      ...body,
+    })
+    
+    return res(
+      ctx.status(200)
+    )
   })
 ]

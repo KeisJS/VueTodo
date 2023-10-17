@@ -8,7 +8,9 @@ import { setupWorker } from 'msw';
 if (import.meta.env.VITE_USE_DEV_HTTP_MOCK) {
   const handlers = await import('/src/components/todo/mock/todoMock')
 
-  setupWorker(...handlers.default).start()
+  setupWorker(...handlers.default).start({
+    onUnhandledRequest: 'bypass',
+  })
 }
 
 const app = createApp(App)

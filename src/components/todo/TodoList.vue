@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { injectTasks } from '@/components/todo/taskProvider';
+import { injectTasksApi } from '@/components/todo/taskApi';
 import { watch } from 'vue';
 
-const taskDeps = injectTasks()
+const { tasks, addTask } = injectTasksApi()
+const { data } = tasks;
 
-watch(() => taskDeps?.addTask.isLoading, () => {
-  if (taskDeps && !taskDeps.addTask.isLoading) {
-    taskDeps.tasks.reFetch();
+watch(addTask.isSuccess, (isSuccess) => {
+  if (isSuccess) {
+    tasks.reFetch();
   }
 })
 </script>
@@ -22,7 +23,7 @@ watch(() => taskDeps?.addTask.isLoading, () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="task in taskDeps?.tasks.data" :key="task.id">
+        <tr v-for="task in data" :key="task.id">
           <td>{{ task.description }}</td>
           <td>{{ task.created }}</td>
         </tr>

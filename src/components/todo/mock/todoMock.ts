@@ -22,8 +22,13 @@ export default [
       ...body,
     })
     
-    return res(
-      ctx.status(200)
-    )
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(res(
+          ctx.status(200),
+          ctx.json('')
+        ))
+      }, 1000)
+    })
   })
 ]

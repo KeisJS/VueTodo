@@ -1,9 +1,9 @@
-import useFetch from '@/utils/useFetch';
 import type { InjectionKey } from 'vue';
 import type { ITodo } from '@/components/todo/types';
 import { inject, provide } from 'vue';
+import useFetch from '@/utils/useFetch/useFetch';
 
-const taskProvider = () => {
+const taskApi = () => {
   const tasks = useFetch<ITodo[]>({
     url: '/tasks',
   })
@@ -19,12 +19,12 @@ const taskProvider = () => {
   }
 }
 
-const providerKey = Symbol() as InjectionKey<ReturnType<typeof taskProvider>>
+const providerKey = Symbol() as InjectionKey<ReturnType<typeof taskApi>>
 
-const attachTaskProvider = () => {
-  provide(providerKey, taskProvider())
+const attachTaskApi = () => {
+  provide(providerKey, taskApi())
 }
 
-const injectTasks = () => inject(providerKey);
+const injectTasksApi = () => inject(providerKey) as ReturnType<typeof taskApi>;
 
-export { taskProvider, injectTasks, attachTaskProvider }
+export { injectTasksApi, attachTaskApi }

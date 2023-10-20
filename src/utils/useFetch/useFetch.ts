@@ -1,5 +1,6 @@
 import { ref, toValue, watch } from 'vue';
 import type { IUseFetchParams } from '@/utils/useFetch/types';
+import appFetch from '@/utils/fetch/appFetch';
 
 const useFetch = <Response, Payload>(fetchParams: IUseFetchParams) => {
   const { url, method = 'GET' } = fetchParams
@@ -24,7 +25,7 @@ const useFetch = <Response, Payload>(fetchParams: IUseFetchParams) => {
         options.body = JSON.stringify((toValue(data) || ''))
       }
       
-      const response = await fetch<Response>(url, options)
+      const response = await appFetch(url, options)
       
       responseData.value = await response.json()
       isSuccess.value = true

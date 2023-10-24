@@ -28,7 +28,6 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
       const isError = ref<boolean | undefined>(undefined)
       const queryUrl = ref(url)
       const queryPayload = ref<Payload>()
-      const fetchFlag = ref<boolean>(false)
       const dataResponse = ref<Response>(initValue)
       const concreteFetch = async () => {
         const actualUrl = toValue(queryUrl)
@@ -59,10 +58,6 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
         }
       }
       
-      watch(fetchFlag, () => {
-        concreteFetch()
-      })
-      
       const updateQueryOptions = (options: IWatcherValues<QueryParams, Payload>) => {
         const { data, params } = options
         
@@ -80,7 +75,7 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
         isSuccess,
         isError,
         data: dataResponse,
-        fetch: () => fetchFlag.value = !fetchFlag.value,
+        fetch: concreteFetch,
         updateQueryOptions,
       }
     })

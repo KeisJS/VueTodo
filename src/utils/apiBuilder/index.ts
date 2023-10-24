@@ -3,7 +3,7 @@ import { ref, toValue, watch } from 'vue';
 import type { WatchOptions } from 'vue';
 import { parseTemplate } from 'url-template';
 import apiUrl from '@/utils/apiUrl/apiUrl';
-import type { IApiStore, IApiStoreArgs, IBuilderApiArgs, IWatcherValues } from '@/utils/apiBuilder/types';
+import type { IApiStoreArgs, IBuilderApiArgs, IWatcherValues } from '@/utils/apiBuilder/types';
 import useCacheTagManager from '@/utils/apiBuilder/cacheTagManager';
 
 const apiBuilder = <Response = void, QueryParams = void, Payload extends object = void, StoreId extends string>(
@@ -22,7 +22,7 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
     const { paramsWatcher, storeId } = args
     const cacheTagManager = useCacheTagManager()
     
-    const useStore = defineStore<StoreId, IApiStore<Response, QueryParams, Payload>>(storeId || defaultStoreId, () => {
+    const useStore = defineStore(storeId || defaultStoreId, () => {
       const isFetching = ref(false)
       const isSuccess = ref<boolean | undefined>(undefined)
       const isError = ref<boolean | undefined>(undefined)

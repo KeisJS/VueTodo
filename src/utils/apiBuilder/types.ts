@@ -1,4 +1,3 @@
-import { Ref } from 'vue/dist/vue';
 import type { TCacheTypes } from '@/utils/apiBuilder/cacheTagManager/types';
 
 export interface IWatcherValues<QueryParams, Payload> {
@@ -18,13 +17,4 @@ export interface IBuilderApiArgs<Response, QueryParams, Payload, StoreId> {
 export interface IApiStoreArgs<QueryParams, Payload> {
   paramsWatcher?: () => IWatcherValues<QueryParams, Payload>
   storeId?: string
-}
-
-export interface IApiStore<Response, QueryParams, Payload> {
-  data: Ref<Response | undefined>
-  isFetching: Ref<boolean>
-  isSuccess: Ref<boolean | undefined>
-  isError: Ref<boolean | undefined>
-  fetch: () => void
-  updateQueryOptions: (options: IWatcherValues<QueryParams, Payload>) => void
 }

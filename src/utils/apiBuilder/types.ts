@@ -16,10 +16,11 @@ export interface IApiStoreArgs<QueryParams, Payload> {
   paramsWatcher?: () => IWatcherValues<QueryParams, Payload>
 }
 
-export interface IApiStore<Response> {
+export interface IApiStore<Response, QueryParams, Payload> {
   data: Ref<Response | undefined>
   isFetching: Ref<boolean>
   isSuccess: Ref<boolean | undefined>
   isError: Ref<boolean | undefined>
   fetch: () => void
+  updateQueryOptions: (options: IWatcherValues<QueryParams, Payload>) => void
 }

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, watch } from 'vue';
+import { ref, toValue, watch } from 'vue';
 import type { WatchOptions } from 'vue';
 import { parseTemplate } from 'url-template';
 import apiUrl from '@/utils/apiUrl/apiUrl';
@@ -18,15 +18,17 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
   return (args: IApiStoreArgs<QueryParams, Payload> = {}) => {
     const { paramsWatcher } = args
     
-    const useStore = defineStore<StoreId, IApiStore<Response>>(storeId, () => {
+    const useStore = defineStore<StoreId, IApiStore<Response, QueryParams, Payload>>(storeId, () => {
       const isFetching = ref(false)
       const isSuccess = ref<boolean | undefined>(undefined)
       const isError = ref<boolean | undefined>(undefined)
+      const queryUrl = ref(url)
+      const queryPayload = ref<Payload>()
       const fetchFlag = ref<boolean>(false)
       const dataResponse = ref<Response>(initValue)
-      const concreteFetch = async (args: IWatcherValues<QueryParams, Payload> = {}) => {
-        const { data, params } = args
-        const actualUrl = params ? parseTemplate(url).expand(params) : url
+      const concreteFetch = async () => {
+        const actualUrl = toValue(queryUrl)
+        const data = toValue(queryPayload)
         
         try {
           isFetching.value = true
@@ -49,26 +51,20 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
         }
       }
       
-      const watchOptions: WatchOptions = {}
+      watch(fetchFlag, () => {
+        concreteFetch()
+      })
       
-      if (method === 'GET') {
-        watchOptions.immediate = true
-      }
-      
-      if (paramsWatcher && method === 'GET') {
-        watch(
-          () => ({ ...(paramsWatcher()), fetch: fetchFlag.value }),
-          (args) => {
-            concreteFetch(args)
-          },
-          watchOptions
-        )
-      } else {
-        watch(fetchFlag, () => {
-          const args = paramsWatcher && paramsWatcher()
-          
-          concreteFetch(args)
-        }, watchOptions)
+      const updateQueryOptions = (options: IWatcherValues<QueryParams, Payload>) => {
+        const { data, params } = options
+        
+        if (params) {
+          queryUrl.value = parseTemplate(url).expand(params)
+        }
+        
+        if (data) {
+          queryPayload.value = data
+        }
       }
       
       return {
@@ -76,11 +72,38 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
         isSuccess,
         isError,
         data: dataResponse,
-        fetch: () => fetchFlag.value = !fetchFlag.value
+        fetch: () => fetchFlag.value = !fetchFlag.value,
+        updateQueryOptions,
       }
     })
     
-    return useStore()
+    const store = useStore()
+    
+    const watchOptions: WatchOptions = {}
+    
+    if (method === 'GET') {
+      watchOptions.immediate = true
+    }
+    
+    if (paramsWatcher) {
+      watch(
+        () => ({ ...(paramsWatcher()) }),
+        (args) => {
+          store.updateQueryOptions(args)
+          
+          if (method === 'GET') {
+            store.fetch()
+          }
+        },
+        watchOptions
+      )
+    } else {
+      if (method === 'GET') {
+        store.fetch()
+      }
+    }
+    
+    return store
   }
 }
 

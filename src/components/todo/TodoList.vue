@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { injectTasksApi } from '@/components/todo/taskApi';
 import { watch } from 'vue';
+import { useTaskAdd, useTasksFetch } from '@/components/todo/api';
 
-const { tasks, addTask } = injectTasksApi()
-const { data } = tasks;
 
-watch(addTask.isSuccess, (isSuccess) => {
+const addTask = useTaskAdd()
+const tasks = useTasksFetch()
+
+watch(() => addTask.isSuccess, (isSuccess) => {
   if (isSuccess) {
-    tasks.reFetch();
+    tasks.fetch();
   }
 })
+
 </script>
 
 <template>
@@ -23,7 +25,7 @@ watch(addTask.isSuccess, (isSuccess) => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="task in data" :key="task.id">
+        <tr v-for="task in tasks.data" :key="task.id">
           <td>{{ task.description }}</td>
           <td>{{ task.created }}</td>
         </tr>

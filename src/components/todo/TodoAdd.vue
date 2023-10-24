@@ -1,25 +1,31 @@
 <script setup lang="ts">
 import { computed, ref, toValue, watch } from 'vue';
-import { injectTasksApi } from '@/components/todo/taskApi';
+import { useTaskAdd } from '@/components/todo/api';
 
 const taskDescription = ref('')
 
-const { addTask } = injectTasksApi()
+const addTask = useTaskAdd({
+  paramsWatcher: () => ({
+    data: {
+      description: toValue(taskDescription),
+      created: (new Date()).toISOString(),
+    }
+  })
+})
 
 const addHandler = () => {
-  addTask.fetch({
-    description: toValue(taskDescription),
-    created: (new Date()).toISOString(),
-  })
+  if (taskDescription.value) {
+    addTask.fetch()
+  }
 }
 
-watch(addTask.isSuccess, (isSuccess) => {
+watch(() => addTask.isSuccess, (isSuccess) => {
   if (isSuccess) {
     taskDescription.value = '';
   }
 })
 
-const isDisabled = computed(() => !taskDescription.value || addTask.isFetching.value)
+const isDisabled = computed(() => !taskDescription.value || addTask.isFetching)
 const isInputDisabled = addTask.isFetching;
 </script>
 

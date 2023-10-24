@@ -9,16 +9,16 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
   params: IBuilderApiArgs<Response, QueryParams, Payload, StoreId>
 ) => {
   const {
-    storeId,
+    defaultStoreId,
     url,
     method = 'GET',
     initValue,
   } = params
   
   return (args: IApiStoreArgs<QueryParams, Payload> = {}) => {
-    const { paramsWatcher } = args
+    const { paramsWatcher, storeId } = args
     
-    const useStore = defineStore<StoreId, IApiStore<Response, QueryParams, Payload>>(storeId, () => {
+    const useStore = defineStore<StoreId, IApiStore<Response, QueryParams, Payload>>(storeId || defaultStoreId, () => {
       const isFetching = ref(false)
       const isSuccess = ref<boolean | undefined>(undefined)
       const isError = ref<boolean | undefined>(undefined)

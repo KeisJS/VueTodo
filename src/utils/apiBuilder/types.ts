@@ -6,7 +6,7 @@ export interface IWatcherValues<QueryParams, Payload> {
 }
 
 export interface IBuilderApiArgs<Response, QueryParams, Payload, StoreId> {
-  storeId: StoreId
+  defaultStoreId: StoreId
   url: string // url template
   method?: 'GET' | 'POST'
   initValue?: Response
@@ -14,6 +14,7 @@ export interface IBuilderApiArgs<Response, QueryParams, Payload, StoreId> {
 
 export interface IApiStoreArgs<QueryParams, Payload> {
   paramsWatcher?: () => IWatcherValues<QueryParams, Payload>
+  storeId?: string
 }
 
 export interface IApiStore<Response, QueryParams, Payload> {

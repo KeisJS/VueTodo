@@ -2,13 +2,13 @@ import type { ITodo } from '@/components/todo/types';
 import apiBuilder from '@/utils/apiBuilder';
 
 const useTasksFetch = apiBuilder<ITodo[]>({
+  defaultStoreId: 'tasks',
   url: '/tasks',
-  storeId: 'tasks',
   initValue: [],
 })
 
 const useTaskAdd = apiBuilder<void, void, Partial<ITodo>>({
-  storeId: 'addTask',
+  defaultStoreId: 'addTask',
   url: '/tasks',
   method: 'POST'
 })

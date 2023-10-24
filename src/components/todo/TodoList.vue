@@ -1,17 +1,7 @@
 <script setup lang="ts">
-import { watch } from 'vue';
-import { useTaskAdd, useTasksFetch } from '@/components/todo/api';
+import { useTasksFetch } from '@/components/todo/api';
 
-
-const addTask = useTaskAdd()
 const tasks = useTasksFetch()
-
-watch(() => addTask.isSuccess, (isSuccess) => {
-  if (isSuccess) {
-    tasks.fetch();
-  }
-})
-
 </script>
 
 <template>

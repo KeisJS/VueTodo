@@ -5,12 +5,14 @@ const useTasksFetch = apiBuilder<ITodo[]>({
   defaultStoreId: 'tasks',
   url: '/tasks',
   initValue: [],
+  cacheTag: 'TASKS'
 })
 
 const useTaskAdd = apiBuilder<void, void, Partial<ITodo>>({
   defaultStoreId: 'addTask',
   url: '/tasks',
-  method: 'POST'
+  method: 'POST',
+  invalidateTag: 'TASKS'
 })
 
 export {

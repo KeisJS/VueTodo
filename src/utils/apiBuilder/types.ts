@@ -1,4 +1,5 @@
 import { Ref } from 'vue/dist/vue';
+import type { TCacheTypes } from '@/utils/apiBuilder/cacheTagManager/types';
 
 export interface IWatcherValues<QueryParams, Payload> {
   params?: QueryParams
@@ -10,6 +11,8 @@ export interface IBuilderApiArgs<Response, QueryParams, Payload, StoreId> {
   url: string // url template
   method?: 'GET' | 'POST'
   initValue?: Response
+  cacheTag?: TCacheTypes
+  invalidateTag?: TCacheTypes
 }
 
 export interface IApiStoreArgs<QueryParams, Payload> {

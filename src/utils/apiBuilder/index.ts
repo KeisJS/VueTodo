@@ -4,6 +4,7 @@ import type { WatchOptions } from 'vue';
 import { parseTemplate } from 'url-template';
 import apiUrl from '@/utils/apiUrl/apiUrl';
 import type { IApiStore, IApiStoreArgs, IBuilderApiArgs, IWatcherValues } from '@/utils/apiBuilder/types';
+import useCacheTagManager from '@/utils/apiBuilder/cacheTagManager';
 
 const apiBuilder = <Response = void, QueryParams = void, Payload extends object = void, StoreId extends string>(
   params: IBuilderApiArgs<Response, QueryParams, Payload, StoreId>
@@ -13,10 +14,13 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
     url,
     method = 'GET',
     initValue,
+    cacheTag,
+    invalidateTag
   } = params
   
   return (args: IApiStoreArgs<QueryParams, Payload> = {}) => {
     const { paramsWatcher, storeId } = args
+    const cacheTagManager = useCacheTagManager()
     
     const useStore = defineStore<StoreId, IApiStore<Response, QueryParams, Payload>>(storeId || defaultStoreId, () => {
       const isFetching = ref(false)
@@ -44,6 +48,10 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
           
           dataResponse.value = await response.json()
           isSuccess.value = true
+          
+          if (method !== 'GET' && invalidateTag) {
+            cacheTagManager.refresh(invalidateTag)
+          }
         } catch (e) {
           isError.value = true
         } finally {
@@ -101,6 +109,15 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
       if (method === 'GET') {
         store.fetch()
       }
+    }
+    
+    if (cacheTag && method === 'GET') {
+      watch(() =>  cacheTagManager.manager, (tag) => {
+        if (tag === cacheTag) {
+          store.fetch()
+          cacheTagManager.refresh()
+        }
+      })
     }
     
     return store

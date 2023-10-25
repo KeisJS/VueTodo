@@ -29,7 +29,11 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
       const queryUrl = ref(url)
       const queryPayload = ref<Payload>()
       const dataResponse = ref<Response>(initValue)
+      const isNeedUpdate = ref(true)
       const concreteFetch = async () => {
+        if (!isNeedUpdate.value) {
+          return
+        }
         const actualUrl = toValue(queryUrl)
         const data = toValue(queryPayload)
         
@@ -51,6 +55,10 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
           if (method !== 'GET' && invalidateTag) {
             cacheTagManager.refresh(invalidateTag)
           }
+          
+          if (method === 'GET') {
+            isNeedUpdate.value = false
+          }
         } catch (e) {
           isError.value = true
         } finally {
@@ -70,6 +78,14 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
         }
       }
       
+      if (method === 'GET') {
+        watch(() => cacheTagManager.manager, (tags) => {
+          if (tags.includes(cacheTag)) {
+            isNeedUpdate.value = true
+          }
+        })
+      }
+      
       return {
         isFetching,
         isSuccess,
@@ -77,6 +93,7 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
         data: dataResponse,
         fetch: concreteFetch,
         updateQueryOptions,
+        isNeedUpdate,
       }
     })
     
@@ -107,10 +124,10 @@ const apiBuilder = <Response = void, QueryParams = void, Payload extends object 
     }
     
     if (cacheTag && method === 'GET') {
-      watch(() =>  cacheTagManager.manager, (tag) => {
-        if (tag === cacheTag) {
+      watch(() =>  cacheTagManager.manager, (tags) => {
+        if (tags.includes(cacheTag)) {
+          store.isNeedUpdate = true
           store.fetch()
-          cacheTagManager.refresh()
         }
       })
     }

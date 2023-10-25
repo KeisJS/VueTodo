@@ -28,7 +28,7 @@ export default [
           ctx.status(200),
           ctx.json('')
         ))
-      }, 1000)
+      }, 500)
     })
   })
 ]

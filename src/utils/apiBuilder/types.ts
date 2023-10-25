@@ -5,14 +5,26 @@ export interface IWatcherValues<QueryParams, Payload> {
   data?: Payload
 }
 
-export interface IBuilderApiArgs<Response, QueryParams, Payload, StoreId> {
+interface IBuilderApiArgsAbstract<Response, StoreId> {
   defaultStoreId: StoreId
   url: string // url template
-  method?: 'GET' | 'POST'
   initValue?: Response
+}
+
+interface IBuilderApiArgsQuery {
+  method?: 'GET'
   cacheTag?: TCacheTypes
+}
+
+interface IBuilderApiArgsMutation {
+  method: 'POST'
   invalidateTag?: TCacheTypes
 }
+
+export type TBuilderApiArgs<Response, StoreId> = IBuilderApiArgsAbstract<Response, StoreId> & (
+    IBuilderApiArgsQuery | IBuilderApiArgsMutation
+  )
+
 
 export interface IApiStoreArgs<QueryParams, Payload> {
   paramsWatcher?: () => IWatcherValues<QueryParams, Payload>

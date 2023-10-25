@@ -3,11 +3,11 @@ import { ref, toValue, watch } from 'vue';
 import type { WatchOptions } from 'vue';
 import { parseTemplate } from 'url-template';
 import apiUrl from '@/utils/apiUrl/apiUrl';
-import type { IApiStoreArgs, IBuilderApiArgs, IWatcherValues } from '@/utils/apiBuilder/types';
+import type { IApiStoreArgs, TBuilderApiArgs, IWatcherValues } from '@/utils/apiBuilder/types';
 import useCacheTagManager from '@/utils/apiBuilder/cacheTagManager';
 
 const apiBuilder = <Response = void, QueryParams = void, Payload extends object = void, StoreId extends string>(
-  params: IBuilderApiArgs<Response, QueryParams, Payload, StoreId>
+  params: TBuilderApiArgs<Response, StoreId>
 ) => {
   const {
     defaultStoreId,
